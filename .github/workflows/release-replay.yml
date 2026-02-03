@@ -1,0 +1,137 @@
+name: Release Replay Engine
+
+on:
+  push:
+    tags:
+      - 'replay-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: windows
+            runner: ubuntu-latest
+            goos: windows
+            goarch: amd64
+            ext: .exe
+            artifact: zantoras-replay-windows-amd64.exe
+          - os: macos
+            runner: ubuntu-latest
+            goos: darwin
+            goarch: amd64
+            ext: ''
+            artifact: zantoras-replay-macos-amd64
+          - os: macos-arm
+            runner: ubuntu-latest
+            goos: darwin
+            goarch: arm64
+            ext: ''
+            artifact: zantoras-replay-macos-arm64
+          - os: linux
+            runner: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            ext: ''
+            artifact: zantoras-replay-linux-amd64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/replay-v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build binary
+        working-directory: go
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          go build -ldflags "-X main.Version=${{ steps.version.outputs.version }} -X main.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -o ${{ matrix.artifact }} \
+            ./cmd/replay
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: go/${{ matrix.artifact }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/replay-v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: replay-v${{ steps.version.outputs.version }}
+          name: Zantoras Replay Engine v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            ## Zantoras Evidence Replay Engine v${{ steps.version.outputs.version }}
+
+            Auditor tool to verify evidence chain integrity.
+
+            ### Downloads
+            - **Windows**: `zantoras-replay-windows-amd64.exe`
+            - **macOS (Intel)**: `zantoras-replay-macos-amd64`
+            - **macOS (Apple Silicon)**: `zantoras-replay-macos-arm64`
+            - **Linux**: `zantoras-replay-linux-amd64`
+
+            ### Usage
+            ```bash
+            # Verify an evidence export
+            zantoras-replay verify evidence-export.json
+            ```
+
+            ### What it does
+            1. Loads the evidence export file
+            2. Verifies each blob's cryptographic hash
+            3. Verifies the chain linkage (each blob links to previous)
+            4. Verifies the overall chain hash
+            5. Reports ✓ VERIFIED or ✗ TAMPERED
+          files: |
+            artifacts/**/zantoras-replay-*
