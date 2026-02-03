@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zantoras - Tamper-Proof Evidence Engine</title>
+    <meta name="description" content="Cryptographically sealed log intelligence for security, compliance, and forensics.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0f14 0%, #0e1420 50%, #0a1018 100%);
+            color: #fafafa;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 15, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #58a6ff, #bc8cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav a {
+            color: #8b949e;
+            text-decoration: none;
+            margin-left: 32px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: #58a6ff;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 32px 60px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+
+        .hero-tagline {
+            font-size: 18px;
+            color: #8b949e;
+            margin-bottom: 32px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #c9d1d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: none;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #8b949e;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            display: none;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #58a6ff;
+            border: 1px solid #30363d;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: #58a6ff;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 60px;
+            color: #f0f6fc;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            border-radius: 12px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(88, 166, 255, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(88, 166, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: #58a6ff;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #f0f6fc;
+        }
+
+        .feature-card p {
+            color: #8b949e;
+            font-size: 15px;
+        }
+
+        /* Downloads Section */
+        .downloads {
+            padding: 80px 32px;
+            background: rgba(22, 27, 34, 0.5);
+        }
+
+        .downloads-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .downloads h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 16px;
+            color: #f0f6fc;
+        }
+
+        .downloads-subtitle {
+            text-align: center;
+            color: #8b949e;
+            margin-bottom: 48px;
+            font-size: 18px;
+        }
+
+        .download-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .download-card {
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid rgba(48, 54, 61, 0.6);
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .download-card:hover {
+            border-color: #3fb950;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .download-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #f0f6fc;
+        }
+
+        .download-card p {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(63, 185, 80, 0.15);
+            border: 1px solid rgba(63, 185, 80, 0.3);
+            border-radius: 6px;
+            color: #3fb950;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .download-card:hover .download-btn {
+            background: rgba(63, 185, 80, 0.25);
+        }
+
+        .version-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(88, 166, 255, 0.15);
+            border-radius: 12px;
+            color: #58a6ff;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 16px;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 80px 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 48px;
+            color: #f0f6fc;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .step {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #58a6ff, #bc8cff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #f0f6fc;
+        }
+
+        .step-content p {
+            color: #8b949e;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #79c0ff;
+            overflow-x: auto;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 32px;
+            border-top: 1px solid rgba(48, 54, 61, 0.5);
+            text-align: center;
+            color: #6e7681;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 36px; }
+            .hero p { font-size: 16px; }
+            header { padding: 12px 16px; }
+            nav a { margin-left: 16px; font-size: 12px; }
+            .features, .downloads, .how-it-works { padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1a2a3a"/>
+                        <stop offset="100%" style="stop-color:#0d1620"/>
+                    </linearGradient>
+                    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#58a6ff"/>
+                        <stop offset="50%" style="stop-color:#bc8cff"/>
+                        <stop offset="100%" style="stop-color:#58a6ff"/>
+                    </linearGradient>
+                </defs>
+                <path d="M50 5 L90 20 L90 50 Q90 80 50 95 Q10 80 10 50 L10 20 Z" fill="url(#shieldGrad)" stroke="url(#borderGrad)" stroke-width="2"/>
+                <path d="M50 25 L35 45 L42 45 L38 70 L55 48 L48 48 L52 30 Z" fill="#58a6ff" opacity="0.9"/>
+            </svg>
+            <span class="logo-text">Zantoras</span>
+        </div>
+        <nav>
+            <a href="#features">Features</a>
+            <a href="#downloads">Downloads</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="https://engine.zantoras.com" target="_blank">Dashboard</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <img src="logo-transparent-200.png" alt="Zantoras" class="hero-logo">
+        <p class="hero-tagline">Tamper-proof evidence infrastructure for the enterprise</p>
+        <div class="hero-buttons">
+            <a href="https://engine.zantoras.com" class="btn btn-primary" target="_blank">
+                Evidence Engine
+            </a>
+            <a href="#downloads" class="btn btn-secondary">
+                Download Replay Tool
+            </a>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <h2>Enterprise-Grade Evidence Protection</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <h3>Cryptographic Chain</h3>
+                <p>Every log entry is cryptographically linked to the previous, creating an immutable evidence chain that detects any tampering.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3>Anomaly Detection</h3>
+                <p>ML-powered baseline learning automatically flags behavioral outliers and potential security incidents in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                </div>
+                <h3>Auditor Verification</h3>
+                <p>Export evidence chains for independent verification. Auditors can cryptographically prove chain integrity offline.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                    </svg>
+                </div>
+                <h3>Efficient Storage</h3>
+                <p>Zstd compression reduces storage costs by up to 80% while maintaining instant query access to all evidence.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="downloads" id="downloads">
+        <div class="downloads-container">
+            <h2>Download Replay Engine</h2>
+            <p class="downloads-subtitle">Verify evidence chain integrity on your local machine</p>
+
+            <div class="download-cards">
+                <a href="https://github.com/zantoras01/zantoras/releases/latest/download/zantoras-replay-windows-amd64.exe" class="download-card">
+                    <div class="download-icon">🪟</div>
+                    <h3>Windows</h3>
+                    <p>Windows 10/11 (64-bit)</p>
+                    <span class="download-btn">Download .exe</span>
+                </a>
+                <a href="https://github.com/zantoras01/zantoras/releases/latest/download/zantoras-replay-macos-amd64" class="download-card">
+                    <div class="download-icon">🍎</div>
+                    <h3>macOS (Intel)</h3>
+                    <p>macOS 10.15+ (Intel)</p>
+                    <span class="download-btn">Download</span>
+                </a>
+                <a href="https://github.com/zantoras01/zantoras/releases/latest/download/zantoras-replay-macos-arm64" class="download-card">
+                    <div class="download-icon">🍎</div>
+                    <h3>macOS (Apple Silicon)</h3>
+                    <p>macOS 11+ (M1/M2/M3)</p>
+                    <span class="download-btn">Download</span>
+                </a>
+                <a href="https://github.com/zantoras01/zantoras/releases/latest/download/zantoras-replay-linux-amd64" class="download-card">
+                    <div class="download-icon">🐧</div>
+                    <h3>Linux</h3>
+                    <p>Linux (64-bit)</p>
+                    <span class="download-btn">Download</span>
+                </a>
+            </div>
+
+            <div style="text-align: center;">
+                <span class="version-badge">Latest: v1.0.0</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Export Evidence Chain</h3>
+                    <p>From the Evidence Engine dashboard, export your evidence chain as a JSON file. This includes all cryptographic hashes.</p>
+                    <div class="code-block">GET https://engine.zantoras.com/api/v1/evidence/export</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Run Verification</h3>
+                    <p>Use the Replay Engine to verify the exported evidence chain on your local machine or air-gapped system.</p>
+                    <div class="code-block">zantoras-replay verify evidence-export.json</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Review Results</h3>
+                    <p>The Replay Engine verifies every hash in the chain and reports either ✓ VERIFIED (green) or ✗ TAMPERED (red).</p>
+                    <div class="code-block" style="color: #3fb950;">✓ VERIFIED - EVIDENCE CHAIN INTEGRITY CONFIRMED</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Zantoras. Tamper-Proof Log Intelligence.</p>
+        <p style="margin-top: 8px;">
+            <a href="https://engine.zantoras.com">Dashboard</a> &middot;
+            <a href="https://github.com/zantoras01/zantoras">GitHub</a>
+        </p>
+    </footer>
+</body>
+</html>
