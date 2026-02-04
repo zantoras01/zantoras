@@ -24,6 +24,7 @@ jobs:
             goarch: amd64
             ext: .exe
             artifact: zantoras-replay-windows-amd64.exe
+            archive: zantoras-replay-windows-amd64.zip
           - os: macos
             runner: ubuntu-latest
             goos: darwin
@@ -72,7 +73,21 @@ jobs:
             -o ${{ matrix.artifact }} \
             ./cmd/replay
 
-      - name: Upload artifact
+      - name: Package Windows as ZIP
+        if: matrix.goos == 'windows'
+        working-directory: go
+        run: |
+          zip ${{ matrix.archive }} ${{ matrix.artifact }}
+
+      - name: Upload artifact (Windows ZIP)
+        if: matrix.goos == 'windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive }}
+          path: go/${{ matrix.archive }}
+
+      - name: Upload artifact (other platforms)
+        if: matrix.goos != 'windows'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
@@ -116,7 +131,7 @@ jobs:
             Auditor tool to verify evidence chain integrity.
 
             ### Downloads
-            - **Windows**: `zantoras-replay-windows-amd64.exe`
+            - **Windows**: `zantoras-replay-windows-amd64.zip` (extract and run the .exe inside)
             - **macOS (Intel)**: `zantoras-replay-macos-amd64`
             - **macOS (Apple Silicon)**: `zantoras-replay-macos-arm64`
             - **Linux**: `zantoras-replay-linux-amd64`
